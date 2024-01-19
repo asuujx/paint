@@ -11,15 +11,22 @@ namespace paint
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+    /// 
+    public enum DrawingMode
+    {
+        Drawing,
+        Line,
+        Ellipse
+    }
 
     public partial class MainWindow : Window
     {
         Point currentPoint = new Point();
-        Point startPoint = new Point();
         private Color penColor = Colors.Black;
 
-        private bool isDrawing = true;
-        private bool isFigure = false;
+        private DrawingMode currentMode = DrawingMode.Drawing;
+
+        Point startPoint = new Point();
         private bool isFirstClick = true;
 
         public MainWindow()
@@ -27,10 +34,10 @@ namespace paint
             InitializeComponent();
             colorComboBox.SelectedIndex = 0;
         }
-        
+
         private void Canvas_MouseDown_1(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (isFigure)
+            if (currentMode == DrawingMode.Line)
             {
                 if (isFirstClick)
                 {
@@ -46,16 +53,30 @@ namespace paint
                     isFirstClick = true;
                 }
             }
-            else if (isDrawing)
+            else if (currentMode == DrawingMode.Drawing)
             {
                 if (e.ButtonState == MouseButtonState.Pressed)
                     currentPoint = e.GetPosition(paintSurface);
+            }
+            else if (currentMode == DrawingMode.Ellipse)
+            {
+                if (isFirstClick)
+                {
+                    startPoint = e.GetPosition(paintSurface);
+                    isFirstClick = false;
+                }
+                else
+                {
+                    Point endPoint = e.GetPosition(paintSurface);
+                    DrawEllipse(startPoint, endPoint);
+                    isFirstClick = true;
+                }   
             }
         }
 
         private void Canvas_MouseMove_1(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            if (isDrawing && e.LeftButton == MouseButtonState.Pressed)
+            if (currentMode == DrawingMode.Drawing && e.LeftButton == MouseButtonState.Pressed)
             {
                 Line line = new Line();
                 line.Stroke = new SolidColorBrush(penColor);
@@ -70,8 +91,7 @@ namespace paint
 
         private void PenButton_Click(object sender, RoutedEventArgs e)
         {
-            isDrawing = true;
-            isFigure = false;
+            currentMode = DrawingMode.Drawing;
         }
 
         private void FillButton_Click(object sender, RoutedEventArgs e)
@@ -79,18 +99,16 @@ namespace paint
             FillCanvas(penColor); // You can set your desired fill color
         }
 
-        private void FillCanvas(System.Windows.Media.Color color)
+        private void LineButton_Click(Object sender, RoutedEventArgs e)
         {
-            paintSurface.Children.Clear();
-            System.Windows.Shapes.Rectangle backgroundRect = new System.Windows.Shapes.Rectangle
-            {
-                Width = paintSurface.ActualWidth,
-                Height = paintSurface.ActualHeight,
-                Fill = new SolidColorBrush(color)
-            };
-            paintSurface.Children.Add(backgroundRect);
+            currentMode = DrawingMode.Line;
         }
-        
+
+        private void EllipseButton_Click(object sender, RoutedEventArgs e)
+        {
+            currentMode = DrawingMode.Ellipse;
+        }
+
         private void ClearButton_Click(object sender, RoutedEventArgs e)
         {
             paintSurface.Children.Clear();
@@ -124,10 +142,17 @@ namespace paint
                 }
             }
         }
-        private void LineButton_Click(Object sender, RoutedEventArgs e)
+
+        private void FillCanvas(System.Windows.Media.Color color)
         {
-            isDrawing = false;
-            isFigure = true;
+            paintSurface.Children.Clear();
+            System.Windows.Shapes.Rectangle backgroundRect = new System.Windows.Shapes.Rectangle
+            {
+                Width = paintSurface.ActualWidth,
+                Height = paintSurface.ActualHeight,
+                Fill = new SolidColorBrush(color)
+            };
+            paintSurface.Children.Add(backgroundRect);
         }
 
         private void DrawLine(Point start, Point end)
@@ -141,6 +166,23 @@ namespace paint
             line.Y2 = end.Y;
 
             paintSurface.Children.Add(line);
+        }
+
+        private void DrawEllipse(Point center, Point end)
+        {
+            double radiusX = Math.Abs(end.X - center.X);
+            double radiusY = Math.Abs(end.Y - center.Y);
+
+            Ellipse ellipse = new Ellipse();
+            ellipse.Stroke = Brushes.Black;
+            ellipse.StrokeThickness = 2;
+            ellipse.Width = 2 * radiusX;
+            ellipse.Height = 2 * radiusY;
+
+            Canvas.SetLeft(ellipse, center.X - radiusX);
+            Canvas.SetTop(ellipse, center.Y - radiusY);
+
+            paintSurface.Children.Add(ellipse);
         }
     }
 }

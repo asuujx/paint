@@ -186,6 +186,35 @@ namespace paint
             paintSurface.Children.Clear();
         }
 
+        private void ConvertButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string rgbText = RGBTextBox.Text;
+                string[] rgbValues = rgbText.Split(',');
+
+                if (rgbValues.Length != 3)
+                {
+                    MessageBox.Show("Invalid RGB values. Please enter three comma-separated values.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                int r = int.Parse(rgbValues[0]);
+                int g = int.Parse(rgbValues[1]);
+                int b = int.Parse(rgbValues[2]);
+
+                double h, s, v;
+
+                RGBtoHSV(r, g, b, out h, out s, out v);
+
+                HSVTextBox.Text = $"H: {h:F2}, S: {s:F2}, V: {v:F2}";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void ColorComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBoxItem selectedItem = (ComboBoxItem)colorComboBox.SelectedItem;
@@ -205,6 +234,8 @@ namespace paint
                         break;
                     case "Blue":
                         penColor = Colors.Blue;
+                        break;
+                    case "RGB -> HSV":
                         break;
                     case "Eraser":
                         penColor = Colors.White;
@@ -317,6 +348,33 @@ namespace paint
             path.Data = pathGeometry;
 
             paintSurface.Children.Add(path);
+        }
+
+        private static void RGBtoHSV(int r, int g, int b, out double h, out double s, out double v)
+        {
+            double min = Math.Min(Math.Min(r, g), b);
+            double max = Math.Max(Math.Max(r, g), b);
+
+            // Odcień (Hue)
+            h = 0;
+            if (max == r)
+            {
+                h = (60 * ((g - b) / (max - min)) + 360) % 360;
+            }
+            else if (max == g)
+            {
+                h = (60 * ((b - r) / (max - min)) + 120) % 360;
+            }
+            else if (max == b)
+            {
+                h = (60 * ((r - g) / (max - min)) + 240) % 360;
+            }
+
+            // Nasycenie (Saturation)
+            s = (max == 0) ? 0 : (max - min) / max;
+
+            // Jasność (Value)
+            v = max / 255.0;
         }
     }
 }

@@ -27,6 +27,12 @@
             <Button Name="polygonButton" Content="Polygon" Click="PolygonButton_Click" Margin="0,0,10,0" />
             <Button Name="pathButton" Content="Path" Click="PathButton_Click" Margin="0,0,10,0" />
             <Button Name="clearButton" Content="Clear" Click="ClearButton_Click" Margin="0,0,10,0" />
+            <StackPanel Margin="0,0,10,0">
+                <TextBox Name="RGBTextBox">255,0,0</TextBox>
+                <Button Name="ConvertToHSV" Content="RGB to HSV" Click="ConvertButton_Click" />
+                <TextBox Name="HSVTextBox" IsReadOnly="True"></TextBox>
+            </StackPanel>
+            
         </StackPanel>
         <Canvas Name="paintSurface" Grid.Row="1" MouseDown="Canvas_MouseDown_1" MouseMove="Canvas_MouseMove_1" >
             <Canvas.Background>

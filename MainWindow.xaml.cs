@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -17,7 +18,9 @@ namespace paint
         Drawing,
         Line,
         Ellipse,
-        Rectangle
+        Rectangle,
+        Polygon,
+        Path
     }
 
     public partial class MainWindow : Window
@@ -28,6 +31,8 @@ namespace paint
         private DrawingMode currentMode = DrawingMode.Drawing;
 
         Point startPoint = new Point();
+        private IList<Point> polygonVertices = new List<Point>();
+        private IList<Point> pathVertices = new List<Point>(); 
         private bool isFirstClick = true;
 
         public MainWindow()
@@ -87,6 +92,36 @@ namespace paint
                     isFirstClick = true;
                 }
             }
+            else if (currentMode == DrawingMode.Polygon)
+            {
+                if (isFirstClick)
+                {
+                    startPoint = e.GetPosition(paintSurface);
+                    isFirstClick = false;
+                }
+                else
+                {
+                    Point vertex = e.GetPosition(paintSurface);
+                    polygonVertices.Add(vertex);
+                    DrawPolygon(startPoint, polygonVertices);
+                    
+                }
+            }
+            else if (currentMode == DrawingMode.Path)
+            {
+                if (isFirstClick)
+                {
+                    startPoint = e.GetPosition(paintSurface);
+                    isFirstClick = false;
+                }
+                else
+                {
+                    Point vertex = e.GetPosition(paintSurface);
+                    pathVertices.Add(vertex);
+                    DrawPath(startPoint, pathVertices);
+                }
+            }
+
         }
 
         private void Canvas_MouseMove_1(object sender, System.Windows.Input.MouseEventArgs e)
@@ -116,17 +151,34 @@ namespace paint
 
         private void LineButton_Click(Object sender, RoutedEventArgs e)
         {
+            isFirstClick = true;
             currentMode = DrawingMode.Line;
         }
 
         private void EllipseButton_Click(object sender, RoutedEventArgs e)
         {
+            isFirstClick = true;
             currentMode = DrawingMode.Ellipse;
         }
 
-        private void rectangleButton_Click(object sender, RoutedEventArgs e)
+        private void RectangleButton_Click(object sender, RoutedEventArgs e)
         {
+            isFirstClick = true;
             currentMode = DrawingMode.Rectangle;
+        }
+
+        private void PolygonButton_Click(object sender, RoutedEventArgs e)
+        {
+            isFirstClick = true;
+            polygonVertices.Clear();
+            currentMode = DrawingMode.Polygon;
+        }
+
+        private void PathButton_Click(object sender, RoutedEventArgs e)
+        {
+            isFirstClick = true;
+            pathVertices.Clear();
+            currentMode = DrawingMode.Path;
         }
 
         private void ClearButton_Click(object sender, RoutedEventArgs e)
@@ -220,6 +272,51 @@ namespace paint
             Canvas.SetTop(rectangle, center.Y - height / 2);
 
             paintSurface.Children.Add(rectangle);
+        }
+
+        private void DrawPolygon(Point center, IList<Point> vertices)
+        {
+            Polygon polygon = new Polygon();
+            polygon.Stroke = Brushes.Black;
+            polygon.StrokeThickness = 2;
+
+            // Obliczamy współrzędne wierzchołków wielokąta
+            PointCollection points = new PointCollection();
+            foreach (Point vertex in vertices)
+            {
+                points.Add(new Point(center.X + (vertex.X - center.X), center.Y + (vertex.Y - center.Y)));
+            }
+
+            polygon.Points = points;
+            paintSurface.Children.Add(polygon);
+        }
+
+        private void DrawPath(Point center, IList<Point> vertices) 
+        {
+            Path path = new Path();
+            path.Stroke = Brushes.Black;
+            path.StrokeThickness = 2;
+
+            // Tworzymy obiekt PathGeometry
+            PathGeometry pathGeometry = new PathGeometry();
+            PathFigure pathFigure = new PathFigure();
+
+            // Ustawiamy pierwszy punkt na środek
+            pathFigure.StartPoint = center;
+
+            // Dodajemy wierzchołki
+            foreach (Point vertex in vertices)
+            {
+                pathFigure.Segments.Add(new LineSegment(vertex, true));
+            }
+
+            // Dodajemy figurę do geometrii
+            pathGeometry.Figures.Add(pathFigure);
+
+            // Ustawiamy geometrię na ścieżce
+            path.Data = pathGeometry;
+
+            paintSurface.Children.Add(path);
         }
     }
 }

@@ -16,7 +16,8 @@ namespace paint
     {
         Drawing,
         Line,
-        Ellipse
+        Ellipse,
+        Rectangle
     }
 
     public partial class MainWindow : Window
@@ -72,6 +73,20 @@ namespace paint
                     isFirstClick = true;
                 }   
             }
+            else if (currentMode == DrawingMode.Rectangle)
+            {
+                if (isFirstClick)
+                {
+                    startPoint = e.GetPosition(paintSurface);
+                    isFirstClick = false;
+                }
+                else
+                {
+                    Point endPoint = e.GetPosition(paintSurface);
+                    DrawRectangle(startPoint, endPoint);
+                    isFirstClick = true;
+                }
+            }
         }
 
         private void Canvas_MouseMove_1(object sender, System.Windows.Input.MouseEventArgs e)
@@ -107,6 +122,11 @@ namespace paint
         private void EllipseButton_Click(object sender, RoutedEventArgs e)
         {
             currentMode = DrawingMode.Ellipse;
+        }
+
+        private void rectangleButton_Click(object sender, RoutedEventArgs e)
+        {
+            currentMode = DrawingMode.Rectangle;
         }
 
         private void ClearButton_Click(object sender, RoutedEventArgs e)
@@ -183,6 +203,23 @@ namespace paint
             Canvas.SetTop(ellipse, center.Y - radiusY);
 
             paintSurface.Children.Add(ellipse);
+        }
+
+        private void DrawRectangle(Point center, Point corner)
+        {
+            double width = Math.Abs(corner.X - center.X) * 2;
+            double height = Math.Abs(corner.Y - center.Y) * 2;
+
+            Rectangle rectangle = new Rectangle();
+            rectangle.Stroke = Brushes.Black;
+            rectangle.StrokeThickness = 2;
+            rectangle.Width = width;
+            rectangle.Height = height;
+
+            Canvas.SetLeft(rectangle, center.X - width / 2);
+            Canvas.SetTop(rectangle, center.Y - height / 2);
+
+            paintSurface.Children.Add(rectangle);
         }
     }
 }

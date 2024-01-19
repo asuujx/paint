@@ -23,6 +23,7 @@
             <Button Name="fillButton" Content="Fill" Click="FillButton_Click" Margin="0,0,10,0" />
             <Button Name="lineButton" Content="Line" Click="LineButton_Click" Margin="0,0,10,0" />
             <Button Name="ellipseButton" Content="Ellipse" Click="EllipseButton_Click" Margin="0,0,10,0" />
+            <Button Name="rectangleButton" Content="Rectangle" Click="rectangleButton_Click" Margin="0,0,10,0" />
             <Button Name="clearButton" Content="Clear" Click="ClearButton_Click" Margin="0,0,10,0" />
         </StackPanel>
         <Canvas Name="paintSurface" Grid.Row="1" MouseDown="Canvas_MouseDown_1" MouseMove="Canvas_MouseMove_1" >

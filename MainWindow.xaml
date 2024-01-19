@@ -11,29 +11,40 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+        
         <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Center" >
-            <ComboBox Name="colorComboBox" SelectionChanged="ColorComboBox_SelectionChanged">
+            <Label Name="ColorLabel" Content="Color:" FontSize="10" VerticalAlignment="Center" Width="Auto" />
+            <ComboBox Name="colorComboBox" SelectionChanged="ColorComboBox_SelectionChanged" Width="60" Margin="0,0,10,0">
                 <ComboBoxItem>Black</ComboBoxItem>
                 <ComboBoxItem>Red</ComboBoxItem>
                 <ComboBoxItem>Blue</ComboBoxItem>
                 <ComboBoxItem>Eraser</ComboBoxItem>
             </ComboBox>
-            <Label x:Name="ColorLabel" Content="Color" Height="25" FontSize="10" Width="41"/>
-            <Button Name="penButton" Content="Pen" Click="PenButton_Click" Margin="0,0,10,0" />
-            <Button Name="fillButton" Content="Fill" Click="FillButton_Click" Margin="0,0,10,0" />
-            <Button Name="lineButton" Content="Line" Click="LineButton_Click" Margin="0,0,10,0" />
-            <Button Name="ellipseButton" Content="Ellipse" Click="EllipseButton_Click" Margin="0,0,10,0" />
-            <Button Name="rectangleButton" Content="Rectangle" Click="RectangleButton_Click" Margin="0,0,10,0" />
-            <Button Name="polygonButton" Content="Polygon" Click="PolygonButton_Click" Margin="0,0,10,0" />
-            <Button Name="pathButton" Content="Path" Click="PathButton_Click" Margin="0,0,10,0" />
-            <Button Name="clearButton" Content="Clear" Click="ClearButton_Click" Margin="0,0,10,0" />
+            
+            <Button Name="penButton" Content="Pen" Click="PenButton_Click" Margin="0,0,10,0" Width="50" />
+            <Button Name="fillButton" Content="Fill" Click="FillButton_Click" Margin="0,0,10,0" Width="50" />
+            
+            <Button Name="lineButton" Content="Line" Click="LineButton_Click" Margin="0,0,10,0" Width="50" />
+            <Button Name="ellipseButton" Content="Ellipse" Click="EllipseButton_Click" Margin="0,0,10,0" Width="50" />
+            <Button Name="rectangleButton" Content="Rectangle" Click="RectangleButton_Click" Margin="0,0,10,0" Width="60" />
+            <Button Name="polygonButton" Content="Polygon" Click="PolygonButton_Click" Margin="0,0,10,0" Width="50" />
+            <Button Name="pathButton" Content="Path" Click="PathButton_Click" Margin="0,0,10,0" Width="50" />
+            
+            <Button Name="clearButton" Content="Clear" Click="ClearButton_Click" Margin="0,0,10,0" Width="50" />
+            
             <StackPanel VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,0,10,0">
                 <TextBox Name="RGBTextBox">255,0,0</TextBox>
                 <Button Name="ConvertToHSV" Content="RGB to HSV" Click="ConvertButton_Click" />
                 <TextBox Name="HSVTextBox" IsReadOnly="True"></TextBox>
             </StackPanel>
-            <Button Name="EmguCV" Content="EmguCV" Click="EmguButton_Click" Margin="0,0,10,0" />
-            <Button Name="saveButton" Content="Save" Click="SaveButton_Click" Margin="0,0,10,0" />
+
+            <Button Name="EmguCV" Content="EmguCV" Click="EmguButton_Click" Margin="0,0,10,0" Width="50" />
+
+            <Label Name="ShapesLabel" Content="Predefined:" FontSize="10" VerticalAlignment="Center" Width="Auto"/>
+            <Button Name="triangleButton" Content="Triangle" Click="TriangleButton_Click" Margin="0,0,10,0" Width="50" />
+            <Button Name="arrowButton" Content="Arrow" Click="ArrowButton_Click" Margin="0,0,10,0" Width="50" />
+
+            <Button Name="saveButton" Content="Save" Click="SaveButton_Click" Margin="0,0,10,0" Width="50" />
         </StackPanel>
         <Canvas Name="paintSurface" Grid.Row="1" MouseDown="Canvas_MouseDown_1" MouseMove="Canvas_MouseMove_1" >
             <Canvas.Background>

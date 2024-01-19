@@ -29,7 +29,9 @@ namespace paint
         Ellipse,
         Rectangle,
         Polygon,
-        Path
+        Path,
+        Arrow,
+        Triangle
     }
 
     public partial class MainWindow : Window
@@ -128,6 +130,36 @@ namespace paint
                     Point vertex = e.GetPosition(paintSurface);
                     pathVertices.Add(vertex);
                     DrawPath(startPoint, pathVertices);
+                }
+            }
+            else if (currentMode == DrawingMode.Arrow)
+            {
+                if (isFirstClick)
+                {
+                    startPoint = e.GetPosition(paintSurface);
+                    isFirstClick = false;
+                }
+                else
+                {
+                    Point endPoint = e.GetPosition(paintSurface);
+                    DrawArrow(startPoint, endPoint);
+                    isFirstClick = true;
+                }
+            }
+            else if (currentMode == DrawingMode.Triangle)
+            {
+                if (isFirstClick)
+                {
+                    startPoint = e.GetPosition(paintSurface);
+                    isFirstClick = false;
+                }
+                else
+                {
+                    Point secondPoint = e.GetPosition(paintSurface);
+                    Point thirdPoint = new Point(startPoint.X - (secondPoint.X - startPoint.X), secondPoint.Y);
+
+                    DrawTriangle(startPoint, secondPoint, thirdPoint);
+                    isFirstClick = true;
                 }
             }
 
@@ -276,7 +308,7 @@ namespace paint
                 renderTargetBitmap.Render(paintSurface);
 
                 // Create a BitmapEncoder based on the selected file format
-                BitmapEncoder encoder = null;
+                BitmapEncoder? encoder = null;
                 if (saveFileDialog.FilterIndex == 1)
                     encoder = new PngBitmapEncoder();
                 else if (saveFileDialog.FilterIndex == 2)
@@ -290,6 +322,16 @@ namespace paint
                     encoder.Save(fs);
                 }
             }
+        }
+
+        private void TriangleButton_Click(object sender, EventArgs e)
+        {
+            currentMode = DrawingMode.Triangle;
+        }
+
+        private void ArrowButton_Click(object sender, EventArgs e)
+        {
+            currentMode = DrawingMode.Arrow;
         }
 
         private void ColorComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -425,6 +467,84 @@ namespace paint
             path.Data = pathGeometry;
 
             paintSurface.Children.Add(path);
+        }
+
+        private Vector RotateVector(Vector vector, double degrees)
+        {
+            double radians = degrees * (Math.PI / 180.0);
+            double newX = vector.X * Math.Cos(radians) - vector.Y * Math.Sin(radians);
+            double newY = vector.X * Math.Sin(radians) + vector.Y * Math.Cos(radians);
+            return new Vector(newX, newY);
+        }
+
+        private void DrawArrow(Point start, Point end)
+        {
+            // Calculate the arrowhead vectors
+            Vector lineVector = end - start;
+            lineVector.Normalize(); // Normalize to get a unit vector along the line
+
+            // Arrowhead size and rotation angle (you can adjust these values)
+            double arrowheadSize = 10;
+            double rotationAngle = 30;
+
+            // Calculate the rotated vectors for the arrowhead
+            Vector rotatedArrowhead1 = RotateVector(lineVector, rotationAngle) * arrowheadSize;
+            Vector rotatedArrowhead2 = RotateVector(lineVector, -rotationAngle) * arrowheadSize;
+
+            // Draw the main line
+            Line line = new Line
+            {
+                X1 = start.X,
+                Y1 = start.Y,
+                X2 = end.X,
+                Y2 = end.Y,
+                Stroke = Brushes.Black,
+                StrokeThickness = 2
+            };
+
+            // Draw the arrowhead
+            Line arrowhead1 = new Line
+            {
+                X1 = end.X,
+                Y1 = end.Y,
+                X2 = end.X - rotatedArrowhead1.X,
+                Y2 = end.Y - rotatedArrowhead1.Y,
+                Stroke = Brushes.Black,
+                StrokeThickness = 2
+            };
+
+            Line arrowhead2 = new Line
+            {
+                X1 = end.X,
+                Y1 = end.Y,
+                X2 = end.X - rotatedArrowhead2.X,
+                Y2 = end.Y - rotatedArrowhead2.Y,
+                Stroke = Brushes.Black,
+                StrokeThickness = 2
+            };
+
+            // Add the elements to the canvas
+            paintSurface.Children.Add(line);
+            paintSurface.Children.Add(arrowhead1);
+            paintSurface.Children.Add(arrowhead2);
+        }
+
+        private void DrawTriangle(Point point1, Point point2, Point point3)
+        {
+            Polygon triangle = new Polygon();
+            triangle.Stroke = new SolidColorBrush(penColor);
+            triangle.StrokeThickness = 2;
+
+            // Define the triangle vertices
+            System.Windows.Media.PointCollection points = new System.Windows.Media.PointCollection
+            {
+                point1,
+                point2,
+                point3
+            };
+
+            triangle.Points = points;
+            paintSurface.Children.Add(triangle);
         }
 
         private static void RGBtoHSV(int r, int g, int b, out double h, out double s, out double v)

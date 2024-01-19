@@ -226,16 +226,32 @@ namespace paint
         {
             string imagePath = "D:\\University\\YEAR III\\Grafika\\image.jpg";
 
-            int width = 800;
-            int height = 600;
-
+            // Load the image
             Image<Bgr, byte> img = new Image<Bgr, byte>(imagePath);
-            Image<Bgr, byte> resizedImage = img.Resize(width, height, Inter.Linear);
+            CvInvoke.Imshow("Original", img);
 
-            Image<Gray, byte> img2 = resizedImage.Convert<Gray, byte>();
-            Image<Hls, byte> img3 = resizedImage.Convert<Hls, byte>();
+            // Convert the image to grayscale
+            Image<Gray, byte> gray = img.Convert<Gray, byte>().ThresholdBinary(new Gray(150), new Gray(255));
+            CvInvoke.Imshow("GrayImage", gray);
 
-            CvInvoke.Imshow("Original", resizedImage);
+            float[,] matrix = new float[3, 3]
+            {
+                {1, 1, 1},
+                {1, -9, 1},
+                {1, 1, 1}
+            };
+
+            ConvolutionKernelF matrixKernel = new ConvolutionKernelF(matrix);
+
+            var dst = new Mat(gray.Size, DepthType.Cv8U, 1);
+            CvInvoke.Filter2D(gray, dst, matrixKernel, new System.Drawing.Point(0, 0));
+
+            Image<Gray, byte> filteredImage = dst.ToImage<Gray, byte>();
+            CvInvoke.Imshow("Filtered Image", filteredImage);
+
+            Image<Gray, byte> img2 = img.Convert<Gray, byte>();
+            Image<Hls, byte> img3 = img.Convert<Hls, byte>();
+                 
             CvInvoke.Imshow("Image1", img2);
             CvInvoke.Imshow("Image2", img3);
             CvInvoke.WaitKey(0);

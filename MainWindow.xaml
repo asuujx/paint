@@ -5,20 +5,24 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:paint"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="800" Width="1200">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Center" >
-            <Button Name="eraserButton" Content="Eraser" Click="EraserButton_Click" Margin="0,0,10,0" />
+            <ComboBox Name="colorComboBox" SelectionChanged="ColorComboBox_SelectionChanged">
+                <ComboBoxItem>Black</ComboBoxItem>
+                <ComboBoxItem>Red</ComboBoxItem>
+                <ComboBoxItem>Blue</ComboBoxItem>
+                <ComboBoxItem>Eraser</ComboBoxItem>
+            </ComboBox>
+            <Label x:Name="ColorLabel" Content="Color" Height="25" FontSize="10" Width="41"/>
+            <Button Name="penButton" Content="Pen" Click="PenButton_Click" Margin="0,0,10,0" />
             <Button Name="fillButton" Content="Fill" Click="FillButton_Click" Margin="0,0,10,0" />
+            <Button Name="lineButton" Content="Line" Click="LineButton_Click" Margin="0,0,10,0" />
             <Button Name="clearButton" Content="Clear" Click="ClearButton_Click" Margin="0,0,10,0" />
-            <Button Name="colorRedButton" Content="Red" Click="ColorRedButton_Click" Margin="0,0,10,0" />
-            <Button Name="colorGreenButton" Content="Green" Click="ColorGreenButton_Click" Margin="0,0,10,0" />
-            <Button Name="colorBlueButton" Content="Blue" Click="ColorBlueButton_Click" Margin="0,0,10,0" />
-            <Button Name="colorBlackButton" Content="Black" Click="ColorBlackButton_Click" Margin="0,0,10,0" />
         </StackPanel>
         <Canvas Name="paintSurface" Grid.Row="1" MouseDown="Canvas_MouseDown_1" MouseMove="Canvas_MouseMove_1" >
             <Canvas.Background>

@@ -1,10 +1,17 @@
-﻿using System;
+﻿using Emgu;
+using Emgu.CV;
+using Emgu.CV.CvEnum;
+using Emgu.CV.Structure;
+using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace paint
@@ -215,6 +222,25 @@ namespace paint
             }
         }
 
+        private void EmguButton_Click(object sender, RoutedEventArgs e)
+        {
+            string imagePath = "D:\\University\\YEAR III\\Grafika\\image.jpg";
+
+            int width = 800;
+            int height = 600;
+
+            Image<Bgr, byte> img = new Image<Bgr, byte>(imagePath);
+            Image<Bgr, byte> resizedImage = img.Resize(width, height, Inter.Linear);
+
+            Image<Gray, byte> img2 = resizedImage.Convert<Gray, byte>();
+            Image<Hls, byte> img3 = resizedImage.Convert<Hls, byte>();
+
+            CvInvoke.Imshow("Original", resizedImage);
+            CvInvoke.Imshow("Image1", img2);
+            CvInvoke.Imshow("Image2", img3);
+            CvInvoke.WaitKey(0);
+        }
+
         private void ColorComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBoxItem selectedItem = (ComboBoxItem)colorComboBox.SelectedItem;
@@ -276,7 +302,7 @@ namespace paint
             double radiusX = Math.Abs(end.X - center.X);
             double radiusY = Math.Abs(end.Y - center.Y);
 
-            Ellipse ellipse = new Ellipse();
+            System.Windows.Shapes.Ellipse ellipse = new System.Windows.Shapes.Ellipse();
             ellipse.Stroke = Brushes.Black;
             ellipse.StrokeThickness = 2;
             ellipse.Width = 2 * radiusX;
@@ -312,7 +338,7 @@ namespace paint
             polygon.StrokeThickness = 2;
 
             // Obliczamy współrzędne wierzchołków wielokąta
-            PointCollection points = new PointCollection();
+            System.Windows.Media.PointCollection points = new System.Windows.Media.PointCollection();
             foreach (Point vertex in vertices)
             {
                 points.Add(new Point(center.X + (vertex.X - center.X), center.Y + (vertex.Y - center.Y)));

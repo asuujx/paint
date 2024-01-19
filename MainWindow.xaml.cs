@@ -5,11 +5,13 @@ using Emgu.CV.Structure;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
@@ -257,6 +259,39 @@ namespace paint
             CvInvoke.WaitKey(0);
         }
 
+        private void SaveButton_Click(object sender, EventArgs e)
+        {
+            Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog();
+            saveFileDialog.Filter = "JPeg Image|*.jpg|PNG Image|*.png";
+            saveFileDialog.Title = "Save an Image File";
+            saveFileDialog.ShowDialog();
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                // Create a RenderTargetBitmap
+                RenderTargetBitmap renderTargetBitmap =
+                    new RenderTargetBitmap((int)paintSurface.ActualWidth, (int)paintSurface.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+
+                // Render the canvas onto the RenderTargetBitmap
+                renderTargetBitmap.Render(paintSurface);
+
+                // Create a BitmapEncoder based on the selected file format
+                BitmapEncoder encoder = null;
+                if (saveFileDialog.FilterIndex == 1)
+                    encoder = new PngBitmapEncoder();
+                else if (saveFileDialog.FilterIndex == 2)
+                    encoder = new JpegBitmapEncoder();
+
+                BitmapFrame bitmapFrame = BitmapFrame.Create(renderTargetBitmap);
+                encoder.Frames.Add(bitmapFrame);
+
+                using (FileStream fs = new FileStream(saveFileDialog.FileName, FileMode.Create))
+                {
+                    encoder.Save(fs);
+                }
+            }
+        }
+
         private void ColorComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBoxItem selectedItem = (ComboBoxItem)colorComboBox.SelectedItem;
@@ -366,7 +401,7 @@ namespace paint
 
         private void DrawPath(Point center, IList<Point> vertices) 
         {
-            Path path = new Path();
+            System.Windows.Shapes.Path path = new System.Windows.Shapes.Path();
             path.Stroke = Brushes.Black;
             path.StrokeThickness = 2;
 
